@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Registrazione</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #1a1814;
+    --ink-2: #5a5650;
+    --ink-3: #9a9690;
+    --paper: #faf8f4;
+    --paper-2: #f0ece4;
+    --accent: #c8602a;
+    --accent-light: #f5ebe3;
+    --border: rgba(26,24,20,0.12);
+    --radius: 4px;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .container {
+    width: 100%;
+    max-width: 480px;
+    animation: fadeUp 0.6s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { margin-bottom: 2.5rem; }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .header p {
+    font-size: 15px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .form-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 12px; font-weight: 500; color: var(--ink-2); letter-spacing: 0.04em; text-transform: uppercase; }
+  input {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  input:focus { outline: none; border-color: var(--accent); background: white; }
+  input::placeholder { color: var(--ink-3); }
+  .required { color: var(--accent); margin-left: 2px; }
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+  .btn-submit {
+    width: 100%;
+    padding: 13px;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .btn-submit:hover { background: var(--accent); }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .privacy {
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: center;
+    margin-top: 1rem;
+    line-height: 1.5;
+    font-weight: 300;
+  }
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .success-icon {
+    width: 56px; height: 56px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 22px;
+  }
+  .success-screen h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+  }
+  .success-screen p { font-size: 15px; color: var(--ink-2); font-weight: 300; }
+  .error-msg {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  @media (max-width: 480px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Registrati</h1>
+    <p>Compila il modulo per unirti alla nostra comunità. I tuoi dati sono al sicuro.</p>
+  </div>
+
+  <div class="form-card" id="form-card">
+    <div class="error-msg" id="error-msg"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome <span class="required">*</span></label>
+        <input type="text" id="f-nome" placeholder="Mario" />
+      </div>
+      <div class="form-group">
+        <label>Cognome <span class="required">*</span></label>
+        <input type="text" id="f-cognome" placeholder="Rossi" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email <span class="required">*</span></label>
+      <input type="email" id="f-email" placeholder="mario.rossi@email.com" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data di nascita</label>
+        <input type="date" id="f-dob" />
+      </div>
+      <div class="form-group">
+        <label>Telefono</label>
+        <input type="tel" id="f-tel" placeholder="+39 333 000 0000" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Città</label>
+      <input type="text" id="f-city" placeholder="Milano" />
+    </div>
+    <div class="divider"></div>
+    <button class="btn-submit" id="submit-btn" onclick="submitForm()">Invia registrazione</button>
+    <p class="privacy">Inviando il modulo accetti il trattamento dei tuoi dati personali ai sensi del GDPR.</p>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">✓</div>
+    <h2>Registrazione completata</h2>
+    <p>Grazie! I tuoi dati sono stati ricevuti correttamente.</p>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBvxefVim8k5cBxpH3vWTcDr2P5HVsLfrs",
+    authDomain: "mio-database-contatti.firebaseapp.com",
+    projectId: "mio-database-contatti",
+    storageBucket: "mio-database-contatti.firebasestorage.app",
+    messagingSenderId: "563371481259",
+    appId: "1:563371481259:web:1ad13f356e2eabef38ffee"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.submitForm = async function() {
+    const nome = document.getElementById('f-nome').value.trim();
+    const cognome = document.getElementById('f-cognome').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const errEl = document.getElementById('error-msg');
+
+    errEl.style.display = 'none';
+    if (!nome || !cognome || !email) {
+      errEl.textContent = 'Compila tutti i campi obbligatori.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!email.includes('@')) {
+      errEl.textContent = 'Inserisci un indirizzo email valido.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Invio in corso...';
+
+    try {
+      await addDoc(collection(db, "contatti"), {
+        nome, cognome, email,
+        dob: document.getElementById('f-dob').value || null,
+        tel: document.getElementById('f-tel').value.trim() || null,
+        city: document.getElementById('f-city').value.trim() || null,
+        createdAt: serverTimestamp()
+      });
+      document.getElementById('form-card').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+    } catch(e) {
+      errEl.textContent = 'Errore durante l\'invio. Riprova tra qualche secondo.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Invia registrazione';
+    }
+  }
+</script>
+</body>
+</html>

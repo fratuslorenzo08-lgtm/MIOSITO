@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — Database Contatti</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #1a1814;
+    --ink-2: #5a5650;
+    --ink-3: #9a9690;
+    --paper: #faf8f4;
+    --paper-2: #f0ece4;
+    --accent: #c8602a;
+    --accent-light: #f5ebe3;
+    --border: rgba(26,24,20,0.12);
+    --radius: 4px;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+  /* LOGIN */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 2rem 1rem;
+  }
+  .login-box { width: 100%; max-width: 360px; animation: fadeUp 0.5s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .login-box h1 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; font-weight: 400; margin-bottom: 0.4rem; }
+  .login-box p { font-size: 14px; color: var(--ink-2); font-weight: 300; margin-bottom: 2rem; }
+  .login-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; }
+  label { font-size: 12px; font-weight: 500; color: var(--ink-2); letter-spacing: 0.04em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  input[type=password], input[type=text], input[type=email], input[type=tel], input[type=date] {
+    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--paper); color: var(--ink); font-size: 15px; font-family: 'DM Sans', sans-serif;
+    font-weight: 300; transition: border-color 0.2s; margin-bottom: 1rem;
+  }
+  input:focus { outline: none; border-color: var(--accent); background: white; }
+  .btn { padding: 11px 20px; border-radius: var(--radius); font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+  .btn-dark { background: var(--ink); color: white; width: 100%; }
+  .btn-dark:hover { background: var(--accent); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--ink-2); }
+  .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .login-error { color: #b91c1c; font-size: 13px; margin-bottom: 1rem; display: none; }
+
+  /* ADMIN */
+  #admin-screen { display: none; min-height: 100vh; }
+  .topbar {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar h2 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; font-weight: 400; }
+  .badge { background: var(--accent-light); color: var(--accent); font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
+  .main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .toolbar { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .search-input {
+    flex: 1; min-width: 200px; padding: 9px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: white; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--ink);
+  }
+  .search-input:focus { outline: none; border-color: var(--accent); }
+  .table-wrap { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead { background: var(--paper-2); }
+  th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 500; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); }
+  td { padding: 13px 16px; border-bottom: 1px solid var(--border); color: var(--ink); font-weight: 300; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--paper); }
+  .avatar-cell { display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--accent); flex-shrink: 0; }
+  .name-cell { font-weight: 400; }
+  .empty-state { text-align: center; padding: 4rem 2rem; color: var(--ink-3); font-size: 14px; font-weight: 300; }
+  .loading { text-align: center; padding: 3rem; color: var(--ink-3); font-size: 14px; }
+  .del-btn { background: transparent; border: none; cursor: pointer; color: var(--ink-3); font-size: 16px; padding: 4px 8px; border-radius: var(--radius); transition: all 0.15s; }
+  .del-btn:hover { color: #b91c1c; background: #fef2f2; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .stat-card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+  .stat-label { font-size: 12px; color: var(--ink-3); font-weight: 300; margin-bottom: 4px; }
+  .stat-value { font-size: 22px; font-weight: 500; color: var(--ink); font-family: 'DM Serif Display', serif; }
+  @media (max-width: 600px) { th.hide-mobile, td.hide-mobile { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>Accesso admin</h1>
+    <p>Area riservata al proprietario del sito.</p>
+    <div class="login-card">
+      <p class="login-error" id="login-error">Password errata. Riprova.</p>
+      <label>Password</label>
+      <input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()" />
+      <button class="btn btn-dark" onclick="doLogin()">Entra</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2>Database contatti</h2>
+      <span class="badge" id="total-badge">0 iscritti</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="exportCSV()">Esporta CSV</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Esci</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Totale iscritti</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ultimo iscritto</div>
+        <div class="stat-value" style="font-size:14px;font-family:'DM Sans',sans-serif;padding-top:4px" id="stat-last">—</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input class="search-input" type="text" id="search" placeholder="Cerca per nome, email, città..." oninput="renderTable()" />
+      <button class="btn btn-outline btn-sm" onclick="loadContacts()">↻ Aggiorna</button>
+    </div>
+
+    <div class="table-wrap">
+      <div class="loading" id="loading">Caricamento contatti...</div>
+      <table id="contacts-table" style="display:none">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th class="hide-mobile">Email</th>
+            <th class="hide-mobile">Data di nascita</th>
+            <th class="hide-mobile">Città</th>
+            <th class="hide-mobile">Iscritto il</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none">Nessun contatto trovato.</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, deleteDoc, doc, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBvxefVim8k5cBxpH3vWTcDr2P5HVsLfrs",
+    authDomain: "mio-database-contatti.firebaseapp.com",
+    projectId: "mio-database-contatti",
+    storageBucket: "mio-database-contatti.firebasestorage.app",
+    messagingSenderId: "563371481259",
+    appId: "1:563371481259:web:1ad13f356e2eabef38ffee"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // ---- PASSWORD (cambiala qui!) ----
+  const ADMIN_PASSWORD = "password2026";
+
+  let contacts = [];
+  let authenticated = false;
+
+  window.doLogin = function() {
+    const pwd = document.getElementById('pwd-input').value;
+    if (pwd === ADMIN_PASSWORD) {
+      authenticated = true;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-screen').style.display = 'block';
+      loadContacts();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
+
+  window.logout = function() {
+    authenticated = false;
+    document.getElementById('admin-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('pwd-input').value = '';
+  }
+
+  window.loadContacts = async function() {
+    if (!authenticated) return;
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('contacts-table').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'none';
+    try {
+      const q = query(collection(db, "contatti"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      contacts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderTable();
+      updateStats();
+    } catch(e) {
+      document.getElementById('loading').textContent = 'Errore nel caricamento. Controlla le regole Firestore.';
+    }
+  }
+
+  function updateStats() {
+    document.getElementById('stat-total').textContent = contacts.length;
+    document.getElementById('total-badge').textContent = contacts.length + ' iscritti';
+    if (contacts.length > 0) {
+      const last = contacts[0];
+      document.getElementById('stat-last').textContent = last.nome + ' ' + last.cognome;
+    }
+  }
+
+  window.renderTable = function() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const filtered = contacts.filter(c =>
+      !q || (c.nome||'').toLowerCase().includes(q) || (c.cognome||'').toLowerCase().includes(q) ||
+      (c.email||'').toLowerCase().includes(q) || (c.city||'').toLowerCase().includes(q)
+    );
+    document.getElementById('loading').style.display = 'none';
+    if (filtered.length === 0) {
+      document.getElementById('contacts-table').style.display = 'none';
+      document.getElementById('empty-state').style.display = 'block';
+      return;
+    }
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('contacts-table').style.display = 'table';
+    const initials = (n,c) => ((n||'')[0]||'').toUpperCase() + ((c||'')[0]||'').toUpperCase();
+    const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('it-IT') : '—';
+    const fmtTS = (ts) => ts?.toDate ? ts.toDate().toLocaleDateString('it-IT') : '—';
+    document.getElementById('table-body').innerHTML = filtered.map(c => `
+      <tr>
+        <td>
+          <div class="avatar-cell">
+            <div class="avatar">${initials(c.nome, c.cognome)}</div>
+            <span class="name-cell">${c.nome||''} ${c.cognome||''}</span>
+          </div>
+        </td>
+        <td class="hide-mobile">${c.email||'—'}</td>
+        <td class="hide-mobile">${fmtDate(c.dob)}</td>
+        <td class="hide-mobile">${c.city||'—'}</td>
+        <td class="hide-mobile">${fmtTS(c.createdAt)}</td>
+        <td><button class="del-btn" onclick="deleteContact('${c.id}')" title="Elimina">✕</button></td>
+      </tr>
+    `).join('');
+  }
+
+  window.deleteContact = async function(id) {
+    if (!confirm('Eliminare questo contatto?')) return;
+    await deleteDoc(doc(db, "contatti", id));
+    contacts = contacts.filter(c => c.id !== id);
+    renderTable();
+    updateStats();
+  }
+
+  window.exportCSV = function() {
+    if (contacts.length === 0) return alert('Nessun contatto da esportare.');
+    const fmtDate = (iso) => iso || '';
+    const fmtTS = (ts) => ts?.toDate ? ts.toDate().toLocaleDateString('it-IT') : '';
+    const rows = [
+      ['Nome','Cognome','Email','Data di nascita','Telefono','Città','Iscritto il'],
+      ...contacts.map(c => [c.nome||'', c.cognome||'', c.email||'', fmtDate(c.dob), c.tel||'', c.city||'', fmtTS(c.createdAt)])
+    ];
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'contatti.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+</body>
+</html>
